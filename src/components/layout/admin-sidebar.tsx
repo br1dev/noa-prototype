@@ -50,7 +50,7 @@ export function AdminSidebar() {
   const initials = user ? getInitials(user.name) : "?"
 
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-border bg-card">
+    <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-border bg-card lg:flex">
       <Link
         to="/admin"
         className="flex items-center gap-3 border-b border-border px-5 py-4 transition-colors hover:bg-muted/40"

@@ -240,7 +240,7 @@ export function AdminLogisticaPage() {
           <IconTruckDelivery className="size-4" aria-hidden />
           <span className="text-xs tracking-wider uppercase">Logística</span>
         </div>
-        <h1 className="text-2xl font-medium tracking-tight">
+        <h1 className="font-heading text-[1.65rem] font-semibold tracking-tight">
           Gestión de entregas
         </h1>
         <p className="text-sm text-muted-foreground">

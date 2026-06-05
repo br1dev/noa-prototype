@@ -41,7 +41,7 @@ export function CatalogPage() {
       <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-[1fr_22rem]">
         <section className="flex min-h-0 flex-col gap-5 overflow-y-auto p-6">
           <header className="flex flex-col gap-3">
-            <h1 className="text-2xl font-medium tracking-tight">Catálogo</h1>
+            <h1 className="font-heading text-[1.65rem] font-semibold tracking-tight">Catálogo</h1>
             <p className="text-sm text-muted-foreground">
               Sumá productos a tu pedido. Aplican condiciones mayoristas.
             </p>

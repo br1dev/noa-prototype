@@ -187,7 +187,7 @@ export function AdminInventarioPage() {
             <IconBox className="size-4" aria-hidden />
             <span className="text-xs tracking-wider uppercase">Inventario</span>
           </div>
-          <h1 className="text-2xl font-medium tracking-tight">
+          <h1 className="font-heading text-[1.65rem] font-semibold tracking-tight">
             Catálogo de productos
           </h1>
           <p className="text-sm text-muted-foreground">

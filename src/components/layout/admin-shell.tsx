@@ -2,6 +2,8 @@ import type { ReactNode } from "react"
 import { Outlet } from "react-router"
 
 import { AdminSidebar } from "@/components/layout/admin-sidebar"
+import { AdminTopbar } from "@/components/layout/admin-topbar"
+import { PageTransition } from "@/components/layout/page-transition"
 
 type AdminShellProps = {
   children?: ReactNode
@@ -9,11 +11,16 @@ type AdminShellProps = {
 
 export function AdminShell({ children }: AdminShellProps) {
   return (
-    <div className="flex h-svh bg-background text-foreground">
-      <AdminSidebar />
-      <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
-        {children ?? <Outlet />}
-      </main>
+    <div className="flex h-svh flex-col bg-background text-foreground lg:flex-row">
+      <AdminTopbar />
+      <div className="flex min-h-0 flex-1 flex-row">
+        <AdminSidebar />
+        <PageTransition>
+          <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+            {children ?? <Outlet />}
+          </main>
+        </PageTransition>
+      </div>
     </div>
   )
 }

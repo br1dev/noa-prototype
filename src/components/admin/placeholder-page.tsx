@@ -33,7 +33,7 @@ export function PlaceholderPage({
           ) : null}
           <span className="text-xs tracking-wider uppercase">{eyebrow}</span>
         </div>
-        <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
+        <h1 className="font-heading text-[1.65rem] font-semibold tracking-tight">{title}</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">{description}</p>
       </header>
 
