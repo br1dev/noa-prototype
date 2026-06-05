@@ -51,6 +51,7 @@ export function CartSummary() {
       items,
       subtotal,
       paymentMethod,
+      deliveryAddress: account?.defaultAddress,
     })
     clear()
     setConfirmOpen(false)

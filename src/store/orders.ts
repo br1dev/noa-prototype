@@ -8,12 +8,15 @@ import type { PaymentMethod } from "@/lib/payment-methods"
 export type Order = {
   id: string
   createdAt: string
+  updatedAt?: string
   userId: string
   userName: string
   items: CartItem[]
   subtotal: number
   paymentMethod: PaymentMethod
   status: OrderStatusId
+  cancelReason?: string
+  deliveryAddress?: string
 }
 
 type CreateOrderInput = {
@@ -22,11 +25,18 @@ type CreateOrderInput = {
   items: CartItem[]
   subtotal: number
   paymentMethod: PaymentMethod
+  deliveryAddress?: string
+}
+
+export type UpdateOrderInput = {
+  status: OrderStatusId
+  cancelReason?: string
 }
 
 type OrdersState = {
   orders: Order[]
   createOrder: (input: CreateOrderInput) => Order
+  updateOrder: (id: string, input: UpdateOrderInput) => Order | undefined
 }
 
 const generateId = (): string => {
@@ -41,18 +51,38 @@ export const useOrdersStore = create<OrdersState>()(
     (set) => ({
       orders: [],
       createOrder: (input) => {
+        const now = new Date().toISOString()
         const order: Order = {
           id: generateId(),
-          createdAt: new Date().toISOString(),
+          createdAt: now,
+          updatedAt: now,
           userId: input.userId,
           userName: input.userName,
           items: input.items,
           subtotal: input.subtotal,
           paymentMethod: input.paymentMethod,
           status: "en-analisis",
+          deliveryAddress: input.deliveryAddress,
         }
         set((state) => ({ orders: [order, ...state.orders] }))
         return order
+      },
+      updateOrder: (id, input) => {
+        let updated: Order | undefined
+        set((state) => ({
+          orders: state.orders.map((order) => {
+            if (order.id !== id) return order
+            updated = {
+              ...order,
+              status: input.status,
+              cancelReason:
+                input.status === "cancelado" ? input.cancelReason : undefined,
+              updatedAt: new Date().toISOString(),
+            }
+            return updated
+          }),
+        }))
+        return updated
       },
     }),
     {

@@ -1,9 +1,13 @@
+import { create } from "zustand"
+import { persist, createJSONStorage } from "zustand/middleware"
+
 import { formatCurrency } from "@/lib/format"
 
 export type Account = {
   creditLimit: number
   currentDebt: number
   availableBalance: number
+  defaultAddress: string
 }
 
 export type AccountBlockReason = "excede-limite" | "saldo-insuficiente"
@@ -38,16 +42,50 @@ export const getBlockReasonMessage = (
   ctx: BlockContext
 ): string => BLOCK_REASON_DESCRIPTIONS[reason](ctx)
 
-const ACCOUNTS: Readonly<Record<string, Account>> = {
+const INITIAL_ACCOUNTS: Readonly<Record<string, Account>> = {
   "u-cliente": {
     creditLimit: 50000,
-    currentDebt: 18500,
-    availableBalance: 31500,
+    currentDebt: 0,
+    availableBalance: 50000,
+    defaultAddress: "Av. Paraguay 2150, Salta Capital",
   },
 }
 
+type AccountsState = {
+  accounts: Record<string, Account>
+  addDeliveryToDebt: (userId: string, amount: number) => void
+}
+
+export const useAccountsStore = create<AccountsState>()(
+  persist(
+    (set) => ({
+      accounts: INITIAL_ACCOUNTS,
+      addDeliveryToDebt: (userId, amount) =>
+        set((state) => {
+          const acc = state.accounts[userId]
+          if (!acc) return state
+          return {
+            accounts: {
+              ...state.accounts,
+              [userId]: {
+                ...acc,
+                currentDebt: acc.currentDebt + amount,
+                availableBalance: acc.availableBalance - amount,
+              },
+            },
+          }
+        }),
+    }),
+    {
+      name: "noa-accounts",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ accounts: state.accounts }),
+    }
+  )
+)
+
 export const getAccountForUser = (userId: string): Account | undefined =>
-  ACCOUNTS[userId]
+  useAccountsStore.getState().accounts[userId]
 
 export const checkOrderAgainstAccount = (
   subtotal: number,

@@ -24,7 +24,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { useAuthStore } from "@/store/auth"
 import { selectOrdersForUser, useOrdersStore } from "@/store/orders"
-import { getAccountForUser } from "@/lib/accounts"
+import { useAccountsStore } from "@/lib/accounts"
 import { formatCurrency, formatDateTime } from "@/lib/format"
 import { getOrderStatus } from "@/lib/order-status"
 import { PAYMENT_METHODS } from "@/lib/payment-methods"
@@ -36,9 +36,8 @@ export function OrdersPage() {
 
   const user = useAuthStore((s) => s.user)
   const orders = useOrdersStore((s) => s.orders)
-  const account = useMemo(
-    () => (user ? getAccountForUser(user.id) : undefined),
-    [user]
+  const account = useAccountsStore((s) =>
+    user ? s.accounts[user.id] : undefined
   )
   const userOrders = useMemo(
     () => (user ? selectOrdersForUser(orders, user.id) : []),
