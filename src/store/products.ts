@@ -1,8 +1,9 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
-import { PRODUCTS, type Product, type ProductForm } from "@/lib/products"
+import { type Product, type ProductForm } from "@/lib/products"
 import type { CategoryId } from "@/lib/categories"
+import { buildAllDemoData } from "@/mocks/builder"
 
 type ProductsState = {
   products: Product[]
@@ -36,7 +37,7 @@ const generateSku = (
 export const useProductsStore = create<ProductsState>()(
   persist(
     (set) => ({
-      products: [...PRODUCTS],
+      products: [...buildAllDemoData().products],
       addProduct: (input) => {
         const product: Product = { id: "", ...input }
         let created: Product | undefined

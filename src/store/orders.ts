@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from "zustand/middleware"
 import type { CartItem } from "@/store/cart"
 import type { OrderStatusId } from "@/lib/order-status"
 import type { PaymentMethod } from "@/lib/payment-methods"
+import { buildAllDemoData } from "@/mocks/builder"
 
 export type Order = {
   id: string
@@ -49,7 +50,7 @@ const generateId = (): string => {
 export const useOrdersStore = create<OrdersState>()(
   persist(
     (set) => ({
-      orders: [],
+      orders: buildAllDemoData().orders,
       createOrder: (input) => {
         const now = new Date().toISOString()
         const order: Order = {

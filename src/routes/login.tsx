@@ -13,7 +13,8 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { useAuthStore } from "@/store/auth"
 import { useAuthHydration } from "@/store/use-auth-hydration"
-import { homePathForRole, MOCK_USERS } from "@/lib/mock-users"
+import { homePathForRole } from "@/lib/mock-users"
+import { LOGIN_DEMO_USER_IDS, MOCK_USERS } from "@/mocks/users"
 
 type LocationState = { from?: Location }
 
@@ -57,7 +58,9 @@ export function LoginPage() {
             Credenciales de prueba
           </p>
           <ul className="flex flex-col gap-1.5">
-            {MOCK_USERS.map((u) => (
+            {MOCK_USERS.filter((u) =>
+              LOGIN_DEMO_USER_IDS.includes(u.id)
+            ).map((u) => (
               <li
                 key={u.id}
                 className="flex flex-col gap-0.5 font-mono text-[11px] leading-tight"

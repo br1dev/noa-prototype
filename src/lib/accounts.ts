@@ -2,6 +2,7 @@ import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
 import { formatCurrency } from "@/lib/format"
+import { INITIAL_ACCOUNTS } from "@/mocks/accounts"
 
 export type Account = {
   creditLimit: number
@@ -41,39 +42,6 @@ export const getBlockReasonMessage = (
   reason: AccountBlockReason,
   ctx: BlockContext
 ): string => BLOCK_REASON_DESCRIPTIONS[reason](ctx)
-
-const INITIAL_ACCOUNTS: Readonly<Record<string, Account>> = {
-  "u-cliente": {
-    creditLimit: 50000,
-    currentDebt: 0,
-    availableBalance: 50000,
-    defaultAddress: "Av. Paraguay 2150, Salta Capital",
-  },
-  "u-cliente-2": {
-    creditLimit: 80000,
-    currentDebt: 32500,
-    availableBalance: 47500,
-    defaultAddress: "Av. San Martín 350, Salta Capital",
-  },
-  "u-cliente-3": {
-    creditLimit: 120000,
-    currentDebt: 0,
-    availableBalance: 120000,
-    defaultAddress: "Calle Belgrano 825, San Salvador de Jujuy",
-  },
-  "u-cliente-4": {
-    creditLimit: 25000,
-    currentDebt: 24800,
-    availableBalance: 200,
-    defaultAddress: "Av. Las Heras 412, Salta Capital",
-  },
-  "u-cliente-5": {
-    creditLimit: 200000,
-    currentDebt: 0,
-    availableBalance: 200000,
-    defaultAddress: "Calle Mitre 1180, San Miguel de Tucumán",
-  },
-}
 
 type AccountsState = {
   accounts: Record<string, Account>

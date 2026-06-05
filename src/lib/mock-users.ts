@@ -51,6 +51,27 @@ export const MOCK_USERS: ReadonlyArray<MockUser> = [
     password: "restaurant123",
     role: "cliente",
   },
+  {
+    id: "u-cliente-6",
+    name: "Dietética Vida Sana",
+    email: "dietetica@noa.com",
+    password: "dietetica123",
+    role: "cliente",
+  },
+  {
+    id: "u-cliente-7",
+    name: "Distribuidora del Sur",
+    email: "distribuidora@noa.com",
+    password: "distribuidora123",
+    role: "cliente",
+  },
+  {
+    id: "u-cliente-8",
+    name: "Panadería La Espiga",
+    email: "panaderia@noa.com",
+    password: "panaderia123",
+    role: "cliente",
+  },
 ]
 
 export const findMockUser = (

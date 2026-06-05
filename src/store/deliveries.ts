@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware"
 
 import type { DeliveryPaymentMethod } from "@/lib/delivery-payment-methods"
 import type { DeliveryCancelReason } from "@/lib/delivery-cancellation-reasons"
+import { buildAllDemoData } from "@/mocks/builder"
 
 export type Delivery = {
   id: string
@@ -52,7 +53,7 @@ const generateId = (): string => {
 export const useDeliveriesStore = create<DeliveriesState>()(
   persist(
     (set) => ({
-      deliveries: [],
+      deliveries: buildAllDemoData().deliveries,
       createDelivery: (input) => {
         const delivery: Delivery = {
           id: generateId(),

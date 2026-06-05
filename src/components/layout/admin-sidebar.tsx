@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Link, NavLink, useNavigate } from "react-router"
 import {
   IconBox,
@@ -5,12 +6,15 @@ import {
   IconChartBar,
   IconLogout,
   IconReceipt,
+  IconRotate,
   IconTruckDelivery,
   IconUsers,
   type Icon,
 } from "@tabler/icons-react"
 
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ResetDemoDataDialog } from "@/components/layout/reset-demo-data-dialog"
 import { useAuthStore } from "@/store/auth"
 import { useCartStore } from "@/store/cart"
 import { getInitials } from "@/lib/initials"
@@ -35,6 +39,7 @@ export function AdminSidebar() {
   const logout = useAuthStore((s) => s.logout)
   const clearCart = useCartStore((s) => s.clear)
   const navigate = useNavigate()
+  const [resetOpen, setResetOpen] = useState(false)
 
   const handleLogout = () => {
     clearCart()
@@ -99,6 +104,20 @@ export function AdminSidebar() {
       </nav>
 
       <div className="mt-auto flex flex-col gap-2 border-t border-border p-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setResetOpen(true)}
+          aria-label="Resetear datos de demo"
+          className="w-full justify-start gap-2 border-dashed text-muted-foreground hover:text-foreground"
+        >
+          <IconRotate data-icon="inline-start" className="size-3.5" />
+          <span className="flex-1 text-left">Resetear datos de demo</span>
+          <Badge variant="secondary" className="text-[10px]">
+            Demo
+          </Badge>
+        </Button>
         <div className="flex items-center gap-3 rounded-md px-2 py-2">
           <div
             className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary"
@@ -127,6 +146,7 @@ export function AdminSidebar() {
           Salir
         </Button>
       </div>
+      <ResetDemoDataDialog open={resetOpen} onOpenChange={setResetOpen} />
     </aside>
   )
 }
