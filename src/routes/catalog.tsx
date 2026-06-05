@@ -13,7 +13,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { IconSearch } from "@tabler/icons-react"
-import { PRODUCTS } from "@/lib/products"
+import { useProductsStore } from "@/store/products"
 import type { CategoryId } from "@/lib/categories"
 
 export function CatalogPage() {
@@ -21,19 +21,20 @@ export function CatalogPage() {
     document.title = "Catálogo · Distribuidora NOA"
   }, [])
 
+  const products = useProductsStore((s) => s.products)
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState<CategoryId | "all">("all")
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase()
-    return PRODUCTS.filter((product) => {
+    return products.filter((product) => {
       const matchesCategory =
         category === "all" ? true : product.category === category
       if (!matchesCategory) return false
       if (!normalized) return true
       return product.name.toLowerCase().includes(normalized)
     })
-  }, [query, category])
+  }, [products, query, category])
 
   return (
     <ClientShell>

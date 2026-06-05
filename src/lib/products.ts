@@ -188,3 +188,5 @@ export const PRODUCTS: ReadonlyArray<Product> = [
 
 export const findProduct = (id: string): Product | undefined =>
   PRODUCTS.find((p) => p.id === id)
+
+export type ProductForm = Omit<Product, "id">
