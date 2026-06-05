@@ -23,6 +23,34 @@ export const MOCK_USERS: ReadonlyArray<MockUser> = [
     password: "cliente123",
     role: "cliente",
   },
+  {
+    id: "u-cliente-2",
+    name: "Minimercado El Norte",
+    email: "minimercado@noa.com",
+    password: "minimercado123",
+    role: "cliente",
+  },
+  {
+    id: "u-cliente-3",
+    name: "Almacén Don Pedro",
+    email: "almacen@noa.com",
+    password: "almacen123",
+    role: "cliente",
+  },
+  {
+    id: "u-cliente-4",
+    name: "Kiosco Las Heras",
+    email: "kiosco@noa.com",
+    password: "kiosco123",
+    role: "cliente",
+  },
+  {
+    id: "u-cliente-5",
+    name: "Restaurant La Tradición",
+    email: "restaurant@noa.com",
+    password: "restaurant123",
+    role: "cliente",
+  },
 ]
 
 export const findMockUser = (
