@@ -5,6 +5,7 @@ import { IconBuildingWarehouse, IconLogout } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useAuthStore } from "@/store/auth"
+import { useCartStore } from "@/store/cart"
 
 type AppShellProps = {
   children: ReactNode
@@ -13,9 +14,11 @@ type AppShellProps = {
 export function AppShell({ children }: AppShellProps) {
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
+  const clearCart = useCartStore((s) => s.clear)
   const navigate = useNavigate()
 
   const handleLogout = () => {
+    clearCart()
     logout()
     navigate("/login", { replace: true })
   }

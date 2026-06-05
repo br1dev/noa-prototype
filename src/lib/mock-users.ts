@@ -36,4 +36,4 @@ export const findMockUser = (
   )
 
 export const homePathForRole = (role: Role): string =>
-  role === "admin" ? "/admin" : "/catalogo"
+  role === "admin" ? "/admin" : "/pedidos"

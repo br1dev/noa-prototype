@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { LoginPage } from "@/routes/login"
 import { CatalogPage } from "@/routes/catalog"
+import { OrdersPage } from "@/routes/orders"
 import { AdminPage } from "@/routes/admin"
 import { useAuthStore } from "@/store/auth"
 import { useAuthHydration } from "@/store/use-auth-hydration"
@@ -33,6 +34,14 @@ export function App() {
         element={
           <ProtectedRoute requiredRole="cliente">
             <CatalogPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pedidos"
+        element={
+          <ProtectedRoute requiredRole="cliente">
+            <OrdersPage />
           </ProtectedRoute>
         }
       />
