@@ -43,6 +43,7 @@ import type { DeliveryPaymentMethod } from "@/lib/delivery-payment-methods"
 import type { DeliveryCancelReason } from "@/lib/delivery-cancellation-reasons"
 import { formatCurrency } from "@/lib/format"
 import type { OrderStatusId } from "@/lib/order-status"
+import { PAYMENT_METHODS, type PaymentMethod } from "@/lib/payment-methods"
 import { useOrdersStore, type Order } from "@/store/orders"
 import { useDeliveriesStore } from "@/store/deliveries"
 
@@ -56,15 +57,19 @@ const STATUS_FILTERS: ReadonlyArray<{ id: StatusFilter; label: string }> = [
   { id: "entregado", label: "Entregados" },
 ]
 
+type PaymentFilter = PaymentMethod | "all"
+
 type FiltersState = {
   query: string
   status: StatusFilter
+  paymentMethod: PaymentFilter
   page: number
 }
 
 const INITIAL_FILTERS: FiltersState = {
   query: "",
   status: "en-proceso",
+  paymentMethod: "all",
   page: 1,
 }
 
@@ -119,6 +124,8 @@ export function AdminLogisticaPage() {
     setFilters((prev) => ({ ...prev, query, page: 1 }))
   const setStatus = (status: StatusFilter) =>
     setFilters((prev) => ({ ...prev, status, page: 1 }))
+  const setPaymentMethod = (paymentMethod: PaymentFilter) =>
+    setFilters((prev) => ({ ...prev, paymentMethod, page: 1 }))
   const setPage = (page: number) => setFilters((prev) => ({ ...prev, page }))
 
   const scopedOrders = useMemo(
@@ -128,13 +135,20 @@ export function AdminLogisticaPage() {
 
   const filtered = useMemo(() => {
     const normalized = filters.query.trim().toLowerCase()
-    if (!normalized) return scopedOrders
-    return scopedOrders.filter(
-      (order) =>
+    return scopedOrders.filter((order) => {
+      if (
+        filters.paymentMethod !== "all" &&
+        order.paymentMethod !== filters.paymentMethod
+      ) {
+        return false
+      }
+      if (!normalized) return true
+      return (
         order.id.toLowerCase().includes(normalized) ||
         order.userName.toLowerCase().includes(normalized)
-    )
-  }, [scopedOrders, filters.query])
+      )
+    })
+  }, [scopedOrders, filters.query, filters.paymentMethod])
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const safePage = Math.min(filters.page, pageCount)
@@ -248,30 +262,56 @@ export function AdminLogisticaPage() {
         </p>
       </header>
 
-      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3 sm:flex-row sm:items-center">
-        <SearchInput
-          value={filters.query}
-          onChange={setQuery}
-          placeholder="Buscar por ID o cliente…"
-          ariaLabel="Buscar entregas"
-          className="sm:max-w-sm"
-        />
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <SearchInput
+            value={filters.query}
+            onChange={setQuery}
+            placeholder="Buscar por ID o cliente…"
+            ariaLabel="Buscar entregas"
+            className="sm:max-w-sm"
+          />
+          <ToggleGroup
+            type="single"
+            value={filters.status}
+            onValueChange={(next) => {
+              if (next) setStatus(next as StatusFilter)
+            }}
+            variant="outline"
+            spacing={0}
+            aria-label="Filtrar por estado"
+            className="flex-wrap"
+          >
+            {STATUS_FILTERS.map((opt) => (
+              <ToggleGroupItem key={opt.id} value={opt.id} aria-label={opt.label}>
+                {opt.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
         <ToggleGroup
           type="single"
-          value={filters.status}
+          value={filters.paymentMethod}
           onValueChange={(next) => {
-            if (next) setStatus(next as StatusFilter)
+            if (next) setPaymentMethod(next as PaymentFilter)
           }}
           variant="outline"
           spacing={0}
-          aria-label="Filtrar por estado"
+          aria-label="Filtrar por medio de pago"
           className="flex-wrap"
         >
-          {STATUS_FILTERS.map((opt) => (
-            <ToggleGroupItem key={opt.id} value={opt.id} aria-label={opt.label}>
-              {opt.label}
-            </ToggleGroupItem>
-          ))}
+          <ToggleGroupItem value="all" aria-label="Todos los medios de pago">
+            Todos
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="cuenta-corriente"
+            aria-label="Cuenta corriente"
+          >
+            Cta. cte.
+          </ToggleGroupItem>
+          <ToggleGroupItem value="contado" aria-label="Contado">
+            Contado
+          </ToggleGroupItem>
         </ToggleGroup>
       </div>
 
@@ -290,6 +330,7 @@ export function AdminLogisticaPage() {
                 <TableHead>Cliente</TableHead>
                 <TableHead>Dirección</TableHead>
                 <TableHead className="text-right">Total</TableHead>
+                <TableHead>Medio de pago</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -341,9 +382,7 @@ export function AdminLogisticaPage() {
           deliveryAddress={selectedRegisterOrder.deliveryAddress}
           subtotal={selectedRegisterOrder.subtotal}
           availableBalance={selectedRegisterAccountAvailableBalance}
-          orderIsCtaCte={
-            selectedRegisterOrder.paymentMethod === "cuenta-corriente"
-          }
+          orderPaymentMethod={selectedRegisterOrder.paymentMethod}
           onConfirm={handleRegisterDelivery}
         />
       ) : null}
@@ -376,6 +415,9 @@ function LogisticsOrderRow({
   const shortId = order.id.slice(0, 8).toUpperCase()
   const status = getStatusBadge(order.status)
   const inProcess = order.status === "en-proceso"
+  const paymentLabel =
+    PAYMENT_METHODS.find((m) => m.id === order.paymentMethod)?.label ??
+    order.paymentMethod
 
   return (
     <TableRow>
@@ -397,6 +439,9 @@ function LogisticsOrderRow({
       </TableCell>
       <TableCell className="text-right font-medium tabular-nums">
         {formatCurrency(order.subtotal)}
+      </TableCell>
+      <TableCell>
+        <Badge variant="outline">{paymentLabel}</Badge>
       </TableCell>
       <TableCell>
         <Badge variant={status.variant}>{status.label}</Badge>

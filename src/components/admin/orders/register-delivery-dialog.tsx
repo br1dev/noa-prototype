@@ -3,6 +3,7 @@ import {
   IconBuildingWarehouse,
   IconMapPin,
   IconReceipt,
+  IconWallet,
 } from "@tabler/icons-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -24,6 +25,7 @@ import {
   type DeliveryPaymentMethod,
 } from "@/lib/delivery-payment-methods"
 import { formatCurrency } from "@/lib/format"
+import { PAYMENT_METHODS, type PaymentMethod } from "@/lib/payment-methods"
 import { cn } from "@/lib/utils"
 
 type RegisterDeliveryDialogProps = {
@@ -34,7 +36,7 @@ type RegisterDeliveryDialogProps = {
   deliveryAddress?: string
   subtotal: number
   availableBalance: number
-  orderIsCtaCte: boolean
+  orderPaymentMethod: PaymentMethod
   onConfirm: (input: {
     paymentMethod: DeliveryPaymentMethod
     receivedAmount: number
@@ -51,9 +53,10 @@ export function RegisterDeliveryDialog({
   deliveryAddress,
   subtotal,
   availableBalance,
-  orderIsCtaCte,
+  orderPaymentMethod,
   onConfirm,
 }: RegisterDeliveryDialogProps) {
+  const isCtaCteOrder = orderPaymentMethod === "cuenta-corriente"
   const [paymentMethod, setPaymentMethod] =
     useState<DeliveryPaymentMethod>("efectivo")
   const [receivedAmountText, setReceivedAmountText] = useState<string>(
@@ -67,7 +70,7 @@ export function RegisterDeliveryDialog({
     !Number.isNaN(receivedAmount) &&
     receivedAmount >= 0 &&
     receivedAmount <= subtotal
-  const isInputLocked = isCtaCteImputation || !orderIsCtaCte
+  const isInputLocked = isCtaCteImputation || !isCtaCteOrder
   const debtAmount = hasValidReceivedAmount
     ? Math.max(0, subtotal - receivedAmount)
     : 0
@@ -103,7 +106,7 @@ export function RegisterDeliveryDialog({
     onOpenChange(next)
   }
 
-  const availableMethods = orderIsCtaCte
+  const availableMethods = isCtaCteOrder
     ? DELIVERY_PAYMENT_METHODS
     : DELIVERY_PAYMENT_METHODS.filter((m) => m.id !== "imputacion-cta-cte")
 
@@ -147,6 +150,18 @@ export function RegisterDeliveryDialog({
             <span className="font-medium tabular-nums">
               {formatCurrency(availableBalance)}
             </span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <IconWallet className="size-3.5" aria-hidden />
+              <span className="text-xs tracking-wider uppercase">
+                Medio de pago del pedido
+              </span>
+            </div>
+            <Badge variant="outline">
+              {PAYMENT_METHODS.find((m) => m.id === orderPaymentMethod)?.label ??
+                orderPaymentMethod}
+            </Badge>
           </div>
           {deliveryAddress ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -204,14 +219,14 @@ export function RegisterDeliveryDialog({
             onChange={(e) => setReceivedAmountText(e.target.value)}
             disabled={isInputLocked}
           />
-          {orderIsCtaCte ? (
+          {isCtaCteOrder ? (
             <FieldDescription>{receivedAmountDescription}</FieldDescription>
           ) : null}
           <div className="flex flex-wrap items-center gap-2 pt-1 text-sm">
             <Badge variant={hasDebt ? "secondary" : "outline"}>
               Deuda a registrar: {formatCurrency(debtAmount)}
             </Badge>
-            {orderIsCtaCte && hasDebt ? (
+            {isCtaCteOrder && hasDebt ? (
               <Badge variant="secondary">
                 Saldo después: {formatCurrency(afterBalance)}
               </Badge>
