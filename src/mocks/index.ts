@@ -15,4 +15,4 @@ export type { MockUser, Role } from "@/lib/mock-users"
 export { PRODUCTS, findProduct } from "@/lib/products"
 export type { Product, ProductForm } from "@/lib/products"
 
-export { INITIAL_ACCOUNTS } from "@/mocks/accounts"
+export { INITIAL_ACCOUNT_LIMITS } from "@/mocks/accounts"

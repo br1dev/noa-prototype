@@ -1,6 +1,6 @@
 import type { PaymentMethod } from "@/lib/payment-methods"
 import type { OrderStatusId } from "@/lib/order-status"
-import { INITIAL_ACCOUNTS } from "@/mocks/accounts"
+import { INITIAL_ACCOUNT_LIMITS } from "@/mocks/accounts"
 import { nowInArgentina } from "@/lib/cash-closing"
 import { MOCK_USERS } from "@/lib/mock-users"
 import { PRODUCTS } from "@/lib/products"
@@ -28,7 +28,7 @@ const userNameById = (id: string): string =>
   MOCK_USERS.find((u) => u.id === id)?.name ?? "Cliente"
 
 const accountAddress = (id: string): string | undefined =>
-  INITIAL_ACCOUNTS[id]?.defaultAddress
+  INITIAL_ACCOUNT_LIMITS[id]?.defaultAddress
 
 const buildDate = (
   argNow: Date,

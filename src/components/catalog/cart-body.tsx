@@ -17,7 +17,11 @@ import { Separator } from "@/components/ui/separator"
 import { useAuthStore } from "@/store/auth"
 import { selectCartSubtotal, useCartStore } from "@/store/cart"
 import { useOrdersStore } from "@/store/orders"
-import { getAccountForUser, type AccountBlockReason } from "@/lib/accounts"
+import {
+  getAccountForUser,
+  useAccountsStore,
+  type AccountBlockReason,
+} from "@/lib/accounts"
 import { formatCurrency } from "@/lib/format"
 
 type CartBodyProps = {
@@ -28,6 +32,7 @@ export function CartBody({ onClose }: CartBodyProps) {
   const items = useCartStore((s) => s.items)
   const clear = useCartStore((s) => s.clear)
   const createOrder = useOrdersStore((s) => s.createOrder)
+  const reserveOrder = useAccountsStore((s) => s.reserveOrder)
   const user = useAuthStore((s) => s.user)
   const account = useMemo(
     () => (user ? getAccountForUser(user.id) : undefined),
@@ -58,6 +63,9 @@ export function CartBody({ onClose }: CartBodyProps) {
       paymentMethod,
       deliveryAddress: account?.defaultAddress,
     })
+    if (paymentMethod === "cuenta-corriente") {
+      reserveOrder(user.id, order.id, subtotal)
+    }
     clear()
     setConfirmOpen(false)
     onClose?.()

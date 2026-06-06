@@ -75,7 +75,9 @@ export function RegisterDeliveryDialog({
     ? Math.max(0, subtotal - receivedAmount)
     : 0
   const hasDebt = debtAmount > 0
-  const afterBalance = availableBalance - debtAmount
+  const afterBalance = hasValidReceivedAmount
+    ? availableBalance + receivedAmount
+    : availableBalance
   const canConfirm = hasValidReceivedAmount
 
   const handlePaymentMethodChange = (next: DeliveryPaymentMethod) => {
@@ -226,7 +228,7 @@ export function RegisterDeliveryDialog({
             <Badge variant={hasDebt ? "secondary" : "outline"}>
               Deuda a registrar: {formatCurrency(debtAmount)}
             </Badge>
-            {isCtaCteOrder && hasDebt ? (
+            {isCtaCteOrder ? (
               <Badge variant="secondary">
                 Saldo después: {formatCurrency(afterBalance)}
               </Badge>

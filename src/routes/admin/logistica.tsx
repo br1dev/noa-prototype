@@ -110,7 +110,8 @@ export function AdminLogisticaPage() {
   const createDeliveryCancellation = useDeliveriesStore(
     (s) => s.createDeliveryCancellation
   )
-  const addDeliveryToDebt = useAccountsStore((s) => s.addDeliveryToDebt)
+  const settleDelivery = useAccountsStore((s) => s.settleDelivery)
+  const releaseOrder = useAccountsStore((s) => s.releaseOrder)
 
   const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
   const [selectedCancelOrderId, setSelectedCancelOrderId] = useState<
@@ -200,8 +201,11 @@ export function AdminLogisticaPage() {
       observations: input.observations,
     })
 
-    if (input.debtAmount > 0) {
-      addDeliveryToDebt(order.userId, input.debtAmount)
+    if (
+      order.paymentMethod === "cuenta-corriente" &&
+      input.receivedAmount > 0
+    ) {
+      settleDelivery(order.userId, order.id, input.receivedAmount)
     }
 
     setSelectedRegisterOrderId(null)
@@ -236,6 +240,10 @@ export function AdminLogisticaPage() {
       reason: input.reason,
       observations: input.observations || undefined,
     })
+
+    if (order.paymentMethod === "cuenta-corriente") {
+      releaseOrder(order.userId, order.id, order.subtotal)
+    }
 
     setSelectedCancelOrderId(null)
     toast.success("Entrega cancelada", {

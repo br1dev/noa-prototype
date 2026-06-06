@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/table"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useOrdersStore, type Order } from "@/store/orders"
+import { useAccountsStore } from "@/lib/accounts"
 import { formatCurrency, formatDateTime } from "@/lib/format"
 import { PAYMENT_METHODS, type PaymentMethod } from "@/lib/payment-methods"
 
@@ -59,6 +60,7 @@ export function AdminPedidosPage() {
 
   const orders = useOrdersStore((s) => s.orders)
   const updateOrder = useOrdersStore((s) => s.updateOrder)
+  const releaseOrder = useAccountsStore((s) => s.releaseOrder)
 
   const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS)
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
@@ -120,6 +122,7 @@ export function AdminPedidosPage() {
   }
 
   const handleCancel = (orderId: string, reason: string) => {
+    const targetOrder = orders.find((o) => o.id === orderId)
     const updated = updateOrder(orderId, {
       status: "cancelado",
       cancelReason: reason,
@@ -129,6 +132,9 @@ export function AdminPedidosPage() {
         description: "Es posible que ya haya sido procesado.",
       })
       return
+    }
+    if (targetOrder && targetOrder.paymentMethod === "cuenta-corriente") {
+      releaseOrder(targetOrder.userId, targetOrder.id, targetOrder.subtotal)
     }
     setSelectedOrderId(null)
     toast.success("Pedido cancelado", {

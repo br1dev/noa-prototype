@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
 import { formatCurrency } from "@/lib/format"
-import { INITIAL_ACCOUNTS } from "@/mocks/accounts"
+import { buildAllDemoData } from "@/mocks/builder"
 
 export type Account = {
   creditLimit: number
@@ -45,7 +45,13 @@ export const getBlockReasonMessage = (
 
 type AccountsState = {
   accounts: Record<string, Account>
-  addDeliveryToDebt: (userId: string, amount: number) => void
+  reserveOrder: (userId: string, orderId: string, amount: number) => void
+  releaseOrder: (userId: string, orderId: string, amount: number) => void
+  settleDelivery: (
+    userId: string,
+    orderId: string,
+    paidAmount: number
+  ) => void
   addDebt: (userId: string, amount: number) => void
   registerPayment: (userId: string, amount: number) => void
   setCreditLimit: (userId: string, newLimit: number) => void
@@ -54,11 +60,11 @@ type AccountsState = {
 export const useAccountsStore = create<AccountsState>()(
   persist(
     (set) => ({
-      accounts: { ...INITIAL_ACCOUNTS },
-      addDeliveryToDebt: (userId, amount) =>
+      accounts: { ...buildAllDemoData().accounts },
+      reserveOrder: (userId, _orderId, amount) =>
         set((state) => {
           const acc = state.accounts[userId]
-          if (!acc) return state
+          if (!acc || amount <= 0) return state
           return {
             accounts: {
               ...state.accounts,
@@ -66,6 +72,42 @@ export const useAccountsStore = create<AccountsState>()(
                 ...acc,
                 currentDebt: acc.currentDebt + amount,
                 availableBalance: acc.availableBalance - amount,
+              },
+            },
+          }
+        }),
+      releaseOrder: (userId, _orderId, amount) =>
+        set((state) => {
+          const acc = state.accounts[userId]
+          if (!acc || amount <= 0) return state
+          return {
+            accounts: {
+              ...state.accounts,
+              [userId]: {
+                ...acc,
+                currentDebt: Math.max(0, acc.currentDebt - amount),
+                availableBalance: Math.min(
+                  acc.creditLimit,
+                  acc.availableBalance + amount
+                ),
+              },
+            },
+          }
+        }),
+      settleDelivery: (userId, _orderId, paidAmount) =>
+        set((state) => {
+          const acc = state.accounts[userId]
+          if (!acc || paidAmount <= 0) return state
+          return {
+            accounts: {
+              ...state.accounts,
+              [userId]: {
+                ...acc,
+                currentDebt: Math.max(0, acc.currentDebt - paidAmount),
+                availableBalance: Math.min(
+                  acc.creditLimit,
+                  acc.availableBalance + paidAmount
+                ),
               },
             },
           }
@@ -123,8 +165,15 @@ export const useAccountsStore = create<AccountsState>()(
     }),
     {
       name: "noa-accounts",
+      version: 2,
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ accounts: state.accounts }),
+      migrate: (persistedState, version) => {
+        if (version < 2) {
+          return { accounts: buildAllDemoData().accounts }
+        }
+        return persistedState as AccountsState
+      },
     }
   )
 )
